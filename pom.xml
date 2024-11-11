@@ -1,0 +1,238 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.rocoplayer</groupId>
+  <artifactId>Java-Swing-Template</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Java-Swing-Template</name>
+  <description>Java-Swing-Template</description>
+  
+  
+  <properties>
+	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>17</maven.compiler.release>
+	  
+	   <!--JAVA_HOME路径-->
+        <javahome.path>C:/Program Files/Java/jdk-23</javahome.path>
+        <!-- 打包、镜像 统一名称 -->
+        <pkg.imagename>APP</pkg.imagename>
+        <!--厂商 -->
+        <pkg.vendor>xxx有限公司</pkg.vendor>
+        <!-- 描述 -->
+        <pkg.description>Java-Swing-APP-Demo</pkg.description>
+        <!-- 版权 -->
+        <pkg.copyright>rocoplayer.com</pkg.copyright>
+        <!-- 版本号 -->
+        <pkg.version>1.0.0</pkg.version>
+  </properties>
+  
+  <dependencies>
+	  
+	  <!-- https://mvnrepository.com/artifact/com.formdev/flatlaf -->
+	<dependency>
+	    <groupId>com.formdev</groupId>
+	    <artifactId>flatlaf</artifactId>
+	    <version>3.4.1</version>
+	</dependency>
+	  
+  </dependencies>
+  
+  <build>
+	  <plugins>
+		  <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                </configuration>
+            </plugin>
+            
+            <!--打包可运行的jar-->
+             <!--<plugin>
+	            <artifactId>maven-assembly-plugin</artifactId>
+	            <configuration>
+	                <archive>
+	                    <manifest>
+	                        <mainClass>com.rocoplayer.app.SwingDemo</mainClass>
+	                    </manifest>
+	                </archive>
+	                <descriptorRefs>
+	                    <descriptorRef>jar-with-dependencies</descriptorRef>
+	                </descriptorRefs>
+	            </configuration>
+	            <executions>
+	                <execution>
+	                    <id>make-assembly</id>
+	                    <phase>package</phase>
+	                    <goals>
+	                        <goal>single</goal>
+	                    </goals>
+	                </execution>
+	            </executions>
+	        </plugin>-->
+	        
+	        
+	        <!-- 使用maven-jar-plugin和maven-dependency-plugin插件打包 -->
+	          <plugin>
+	              <groupId>org.apache.maven.plugins</groupId>
+	              <artifactId>maven-jar-plugin</artifactId>
+	              <version>3.1.0</version>
+	              <configuration>
+					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+					  <!--<outputDirectory>${project.build.directory}/deploy</outputDirectory>
+					      <finalName>app</finalName>-->
+	                 <archive>
+	                     <manifest>
+	                         <addClasspath>true</addClasspath>
+	                         <classpathPrefix>lib/</classpathPrefix>
+	                         <mainClass>com.rocoplayer.app.App</mainClass>
+	                     </manifest>
+	                 </archive>
+	             </configuration>
+	         </plugin>
+	
+	         <plugin>
+	             <groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-dependency-plugin</artifactId>
+	             <version>3.1.1</version>
+	            <executions>
+	                 <execution>
+	                    <id>copy-dependencies</id>
+	                     <phase>package</phase>
+	                   <goals>
+	                        <goal>copy-dependencies</goal>
+	                     </goals>
+	                     <configuration>
+	                         <outputDirectory>${project.build.directory}/lib</outputDirectory>
+	                     </configuration>
+	                 </execution>
+	             </executions>
+	         </plugin>
+	         
+	         
+	         <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+					
+					<execution>
+                        <id>jlink</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+							 <!-- 这里配置jpackage程序 -->
+                            <executable>${javahome.path}/bin/jlink</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <arguments>
+								
+                                <argument>--strip-debug</argument>
+                                <argument>--compress</argument>
+                                <argument>1</argument>
+                                <argument>--no-header-files</argument>
+                                <argument>--no-man-pages</argument>
+                                <argument>--module-path</argument>
+                                <argument>${project.build.directory}/lib</argument>
+                                <argument>--add-modules</argument>
+                                <argument>com.rocoplayer</argument>
+                                <argument>--launcher</argument>
+                                <argument>app=com.rocoplayer/com.rocoplayer.app.App</argument>
+                                <argument>--output</argument>
+                                <argument>${project.build.directory}/app-image</argument>
+                                
+                            </arguments>
+                            
+                        </configuration>
+                    </execution>
+					
+					
+                    <execution>
+                        <id>image</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+							 <!-- 这里配置jpackage程序 -->
+                            <executable>${javahome.path}/bin/jpackage</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <arguments>
+                                <argument>-n</argument>
+                                <!-- native [exe] name -->
+                                <argument>${pkg.imagename}</argument>
+                                <argument>-t</argument>
+                                <argument>app-image</argument>
+                                <argument>--java-options</argument>
+                                <argument>-Dfile.encoding=GBK --add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix --add-exports=javafx.base/com.sun.javafx.event=com.jfoenix --add-exports=javafx.controls/javafx.scene.control=com.google.gson --add-opens=com.jfoenix/com.jfoenix.controls.datamodels.treetable=com.google.gson</argument>
+                                <argument>-d</argument>
+                                <argument>${project.build.directory}/nativeBuild</argument>
+                                <argument>-m</argument>
+                                <argument>com.rocoplayer/com.rocoplayer.app.App</argument>
+                                <argument>--icon</argument>
+                                <argument>
+                                    ${project.basedir}/src/main/resources/com/rocoplayer/app/icon/icon.ico
+                                </argument>
+                                <argument>--runtime-image</argument>
+                                <argument>${project.build.directory}/app-image</argument>
+                           		<argument>--app-version</argument>
+                                <argument>${pkg.version}</argument>
+                                <argument>--copyright</argument>
+                                <argument>${pkg.copyright}</argument>
+                                <argument>--vendor</argument>
+                                <argument>${pkg.vendor}</argument>
+                                <argument>--description</argument>
+                                <argument>${pkg.description}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    
+                    
+                    <execution>
+                        <id>installer</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>jpackage</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <arguments>
+                                <argument>-n</argument>
+                                <argument>${pkg.imagename}</argument>
+                                <argument>-t</argument>
+                                <argument>exe</argument>
+                                <argument>--win-shortcut</argument>
+                                <argument>--win-menu</argument>
+                                <argument>--win-dir-chooser</argument>
+                                <argument>--java-options</argument>
+                                <argument>-Dfile.encoding=GBK --add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix --add-exports=javafx.base/com.sun.javafx.event=com.jfoenix --add-exports=javafx.controls/javafx.scene.control=com.google.gson --add-opens=com.jfoenix/com.jfoenix.controls.datamodels.treetable=com.google.gson</argument>
+                                <argument>-d</argument>
+                                <argument>${project.build.directory}/nativeBuild</argument>
+                                <argument>-m</argument>
+                                <argument>com.rocoplayer/com.rocoplayer.app.App</argument>
+                                <argument>--icon</argument>
+                                <argument>
+                                    ${project.basedir}/src/main/resources/com/rocoplayer/app/icon/icon.ico
+                                </argument>
+                                <argument>--runtime-image</argument>
+                                <argument>${project.build.directory}/app-image</argument>
+                                <argument>--app-version</argument>
+                                <argument>${pkg.version}</argument>
+                                <argument>--copyright</argument>
+                                <argument>${pkg.copyright}</argument>
+                                <argument>--vendor</argument>
+                                <argument>${pkg.vendor}</argument>
+                                <argument>--description</argument>
+                                <argument>${pkg.description}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+		        
+	        
+	  </plugins>
+	  
+  </build>
+  
+  
+</project>
