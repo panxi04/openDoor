@@ -2,4 +2,5 @@
 总之这是一个特殊的课表。
 数据储存在软件同目录下的data.txt文件中，可以自行修改。
 本软件不需要安装，直接下载APPv1.5.1.zip的文件到本地，解压即可使用了。
+openDoorYDM.zip是完整的源文件，可以自行选择是否下载。
 使用的是GitHub上一个java的gui开发快速模版制作，其地址为：https://github.com/Janix520/Java-Swing-Template
